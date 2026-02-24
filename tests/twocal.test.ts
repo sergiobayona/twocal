@@ -56,6 +56,10 @@ describe('construction', () => {
     const styles = document.querySelectorAll('style[data-twocal]');
     expect(styles.length).toBeGreaterThanOrEqual(1);
   });
+
+  it('falls back safely for invalid locale strings', () => {
+    expect(() => createPicker({ locale: 'en_US' })).not.toThrow();
+  });
 });
 
 describe('open / close', () => {
@@ -94,6 +98,13 @@ describe('open / close', () => {
     picker.open();
     picker.close();
     expect(onClose).toHaveBeenCalledOnce();
+  });
+
+  it('sets an initial focused day for keyboard navigation', () => {
+    createPicker();
+    picker.open();
+    const focusedDay = document.querySelector('[data-tc-date][tabindex="0"]');
+    expect(focusedDay).not.toBeNull();
   });
 });
 
@@ -173,6 +184,24 @@ describe('presets', () => {
     expect(range.start).toEqual({ year: 2026, month: 2, day: 23 });
     expect(range.end).toEqual({ year: 2026, month: 2, day: 23 });
   });
+
+  it('clamps preset selection to maxDate bounds', () => {
+    createPicker({ maxDate: createCalendarDate(2026, 2, 20) });
+    picker.open();
+
+    const todayPreset = document.querySelector('[data-tc-preset="Today"]') as HTMLElement;
+    todayPreset.click();
+
+    const applyBtn = document.querySelector('[data-tc-action="apply"]') as HTMLElement;
+    applyBtn.click();
+
+    expect(onRangeSelect).toHaveBeenCalledOnce();
+    const range: DateRange = onRangeSelect.mock.calls[0]![0];
+    expect(range).toEqual({
+      start: createCalendarDate(2026, 2, 20),
+      end: createCalendarDate(2026, 2, 20),
+    });
+  });
 });
 
 describe('month navigation', () => {
@@ -237,6 +266,46 @@ describe('getRange / setRange', () => {
     };
     picker.setRange(range);
     expect(picker.getRange()).toEqual(range);
+  });
+
+  it('normalizes reversed ranges in setRange', () => {
+    createPicker();
+    picker.setRange({
+      start: createCalendarDate(2026, 3, 15),
+      end: createCalendarDate(2026, 3, 1),
+    });
+    expect(picker.getRange()).toEqual({
+      start: createCalendarDate(2026, 3, 1),
+      end: createCalendarDate(2026, 3, 15),
+    });
+  });
+
+  it('clamps setRange to min/max bounds', () => {
+    createPicker({
+      minDate: createCalendarDate(2026, 2, 10),
+      maxDate: createCalendarDate(2026, 2, 20),
+    });
+    picker.setRange({
+      start: createCalendarDate(2026, 2, 1),
+      end: createCalendarDate(2026, 2, 28),
+    });
+    expect(picker.getRange()).toEqual({
+      start: createCalendarDate(2026, 2, 10),
+      end: createCalendarDate(2026, 2, 20),
+    });
+  });
+
+  it('rerenders popup when setRange is called while open', () => {
+    createPicker();
+    picker.open();
+    picker.setRange({
+      start: createCalendarDate(2026, 3, 1),
+      end: createCalendarDate(2026, 3, 15),
+    });
+    const startDay = document.querySelector('[data-tc-date="2026-03-01"]') as HTMLElement;
+    const endDay = document.querySelector('[data-tc-date="2026-03-15"]') as HTMLElement;
+    expect(startDay.className).toContain('start');
+    expect(endDay.className).toContain('end');
   });
 });
 

@@ -13,7 +13,14 @@ import { computePosition } from './position';
 import { generateStylePrefix, injectStyles, removeStyles, resolveTheme } from './styles';
 import { defaultPresets } from './presets';
 import { resolveTranslations, isRTL } from './i18n';
-import { calendarDateToString, isSameDay, isBetween, ensureStartBeforeEnd } from './calendar';
+import {
+  calendarDateToString,
+  isSameDay,
+  isBetween,
+  ensureStartBeforeEnd,
+  normalizeAndClampRange,
+  parseCalendarDateString,
+} from './calendar';
 
 export class TwoCal {
   private state: TwoCalState;
@@ -93,14 +100,24 @@ export class TwoCal {
 
   setRange(range: DateRange): void {
     this.guardDestroyed();
-    this.appliedRange = range;
+    const normalized = normalizeAndClampRange(range, this.options.minDate, this.options.maxDate);
+    const wasOpen = this.state.isOpen;
+    this.appliedRange = normalized;
     this.state = {
       ...this.state,
-      rangeStart: range.start,
-      rangeEnd: range.end,
+      rangeStart: normalized.start,
+      rangeEnd: normalized.end,
       selectionPhase: 'range_complete',
-      displayMonth: { year: range.start.year, month: range.start.month, day: 1 },
+      activePreset: null,
+      hoveredDate: null,
+      focusedDate: normalized.end,
+      displayMonth: { year: normalized.start.year, month: normalized.start.month, day: 1 },
     };
+
+    if (wasOpen) {
+      this.rerender();
+      this.updatePosition();
+    }
   }
 
   setTheme(theme: TwoCalTheme): void {
@@ -224,6 +241,8 @@ export class TwoCal {
       {
         stylePrefix: this.stylePrefix,
         presets: this.renderConfig.presets,
+        minDate: this.renderConfig.minDate,
+        maxDate: this.renderConfig.maxDate,
       },
     );
 
@@ -307,18 +326,38 @@ export class TwoCal {
   }
 
   private restoreFocus(): void {
-    if (!this.state.focusedDate) return;
+    const focusedDateStr = this.state.focusedDate
+      ? calendarDateToString(this.state.focusedDate)
+      : null;
 
-    const dateStr = calendarDateToString(this.state.focusedDate);
-    const focusTarget = this.popupContainer.querySelector(
-      `[data-tc-date="${dateStr}"]`,
-    ) as HTMLElement | null;
-    focusTarget?.focus();
+    let focusTarget = focusedDateStr
+      ? (this.popupContainer.querySelector(`[data-tc-date="${focusedDateStr}"]`) as HTMLElement | null)
+      : null;
+
+    if (!focusTarget || (focusTarget as HTMLButtonElement).disabled) {
+      focusTarget = this.popupContainer.querySelector('[data-tc-date]:not(:disabled)') as HTMLElement | null;
+      if (!focusTarget) return;
+      focusTarget.setAttribute('tabindex', '0');
+      const fallbackDate = parseCalendarDateString(focusTarget.getAttribute('data-tc-date') ?? '');
+      if (fallbackDate) {
+        this.state = { ...this.state, focusedDate: fallbackDate };
+      }
+    }
+
+    focusTarget.focus();
   }
 
   private applyRange(): void {
     if (!this.state.rangeStart || !this.state.rangeEnd) return;
-    this.appliedRange = { start: this.state.rangeStart, end: this.state.rangeEnd };
+    const applied = normalizeAndClampRange(
+      { start: this.state.rangeStart, end: this.state.rangeEnd },
+      this.options.minDate,
+      this.options.maxDate,
+    );
+    if (!isSameDay(applied.start, this.state.rangeStart) || !isSameDay(applied.end, this.state.rangeEnd)) {
+      this.state = { ...this.state, rangeStart: applied.start, rangeEnd: applied.end };
+    }
+    this.appliedRange = applied;
     this.options.onRangeSelect(this.appliedRange);
   }
 

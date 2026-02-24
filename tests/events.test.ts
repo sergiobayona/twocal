@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { bindPopupEvents, bindTriggerEvents, bindDocumentEvents } from '../src/events';
 import { defaultPresets } from '../src/presets';
 import type { EventConfig, StateAction } from '../src/types';
@@ -24,12 +24,6 @@ describe('bindPopupEvents', () => {
     cleanup();
     popup.remove();
   });
-
-  function afterEach(fn: () => void) {
-    // vitest global afterEach
-    vi.fn(); // no-op; using inline cleanup
-    return fn; // note: this is just for structure, actual vitest afterEach is at module level
-  }
 
   it('dispatches SELECT_DATE on day click', () => {
     const btn = document.createElement('button');

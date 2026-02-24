@@ -52,8 +52,9 @@ function openPopup(state: TwoCalState): TwoCalState {
   const displayMonth = state.rangeStart
     ? { year: state.rangeStart.year, month: state.rangeStart.month, day: 1 }
     : state.displayMonth;
+  const focusedDate = state.focusedDate ?? state.rangeStart ?? today();
 
-  return { ...state, isOpen: true, displayMonth };
+  return { ...state, isOpen: true, displayMonth, focusedDate };
 }
 
 function closePopup(state: TwoCalState): TwoCalState {

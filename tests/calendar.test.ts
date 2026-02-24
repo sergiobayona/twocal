@@ -184,6 +184,12 @@ describe('formatMonthYear', () => {
     expect(result).toContain('February');
     expect(result).toContain('2026');
   });
+
+  it('falls back for invalid locale strings', () => {
+    expect(() => formatMonthYear(2026, 2, 'en_US')).not.toThrow();
+    const result = formatMonthYear(2026, 2, 'en_US');
+    expect(result.length).toBeGreaterThan(0);
+  });
 });
 
 describe('formatDate', () => {
@@ -192,6 +198,10 @@ describe('formatDate', () => {
     expect(result).toContain('Feb');
     expect(result).toContain('23');
     expect(result).toContain('2026');
+  });
+
+  it('falls back for invalid locale strings', () => {
+    expect(() => formatDate(createCalendarDate(2026, 2, 23), 'en_US')).not.toThrow();
   });
 });
 
@@ -206,6 +216,11 @@ describe('dayNames', () => {
     const names = dayNames('en-US', 1);
     expect(names.length).toBe(7);
     expect(names[0]).toContain('Mon');
+  });
+
+  it('falls back for invalid locale strings', () => {
+    const names = dayNames('en_US', 0);
+    expect(names.length).toBe(7);
   });
 });
 

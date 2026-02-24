@@ -1,5 +1,5 @@
 import type { EventConfig, EventDispatcher, StateAction } from './types';
-import { addDays, parseCalendarDateString } from './calendar';
+import { addDays, normalizeAndClampRange, parseCalendarDateString } from './calendar';
 
 export function bindPopupEvents(
   popupElement: HTMLElement,
@@ -96,7 +96,8 @@ function resolveClickAction(
       if (!presetLabel) return null;
       const preset = config.presets.find((p) => p.label === presetLabel);
       if (!preset) return null;
-      return { type: 'SELECT_PRESET', preset: presetLabel, range: preset.range() };
+      const range = normalizeAndClampRange(preset.range(), config.minDate, config.maxDate);
+      return { type: 'SELECT_PRESET', preset: presetLabel, range };
     }
     case 'prev-month':
       return { type: 'NAVIGATE_MONTH', delta: -1 };

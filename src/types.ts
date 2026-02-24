@@ -124,6 +124,8 @@ export type EventDispatcher = (action: StateAction) => void;
 export interface EventConfig {
   readonly stylePrefix: string;
   readonly presets: ReadonlyArray<PresetRange>;
+  readonly minDate?: CalendarDate | undefined;
+  readonly maxDate?: CalendarDate | undefined;
 }
 
 // ---- Position Types ----

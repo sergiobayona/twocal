@@ -68,9 +68,31 @@ export function isWithinBounds(
   return true;
 }
 
+export function clampDate(
+  date: CalendarDate,
+  min?: CalendarDate,
+  max?: CalendarDate,
+): CalendarDate {
+  let result = date;
+  if (min && isBefore(result, min)) result = min;
+  if (max && isAfter(result, max)) result = max;
+  return result;
+}
+
 export function ensureStartBeforeEnd(a: CalendarDate, b: CalendarDate): DateRange {
   if (isAfter(a, b)) return { start: b, end: a };
   return { start: a, end: b };
+}
+
+export function normalizeAndClampRange(
+  range: DateRange,
+  min?: CalendarDate,
+  max?: CalendarDate,
+): DateRange {
+  const normalized = ensureStartBeforeEnd(range.start, range.end);
+  const start = clampDate(normalized.start, min, max);
+  const end = clampDate(normalized.end, min, max);
+  return ensureStartBeforeEnd(start, end);
 }
 
 export function buildCalendarMonth(
@@ -118,12 +140,12 @@ export function buildCalendarMonth(
 
 export function formatMonthYear(year: number, month: number, locale: string): string {
   const date = new Date(year, month - 1, 1);
-  return new Intl.DateTimeFormat(locale, { month: 'long', year: 'numeric' }).format(date);
+  return safeDateTimeFormat(locale, { month: 'long', year: 'numeric' }).format(date);
 }
 
 export function formatDate(date: CalendarDate, locale: string): string {
   const native = calendarDateToNative(date);
-  return new Intl.DateTimeFormat(locale, {
+  return safeDateTimeFormat(locale, {
     month: 'short',
     day: 'numeric',
     year: 'numeric',
@@ -134,7 +156,7 @@ export function dayNames(locale: string, firstDayOfWeek: 0 | 1): string[] {
   const names: string[] = [];
   // Jan 4, 2024 is a Thursday; Jan 7 is Sunday, Jan 8 is Monday
   const baseSunday = new Date(2024, 0, 7); // known Sunday
-  const formatter = new Intl.DateTimeFormat(locale, { weekday: 'short' });
+  const formatter = safeDateTimeFormat(locale, { weekday: 'short' });
 
   for (let i = 0; i < 7; i++) {
     const d = new Date(baseSunday);
@@ -143,6 +165,17 @@ export function dayNames(locale: string, firstDayOfWeek: 0 | 1): string[] {
   }
 
   return names;
+}
+
+function safeDateTimeFormat(
+  locale: string,
+  options: Intl.DateTimeFormatOptions,
+): Intl.DateTimeFormat {
+  try {
+    return new Intl.DateTimeFormat(locale, options);
+  } catch {
+    return new Intl.DateTimeFormat('en-US', options);
+  }
 }
 
 export function calendarDateToString(date: CalendarDate): string {
