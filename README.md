@@ -146,6 +146,19 @@ import type {
 
 `CalendarDate` uses 1-indexed months: `{ year: 2026, month: 1, day: 15 }` is January 15, 2026.
 
+## Demo
+
+Clone the repo and start the Vite dev server:
+
+```bash
+git clone https://github.com/sergiobayona/twocal.git
+cd twocal
+npm install
+npm run dev
+```
+
+Open the URL printed in the terminal (usually `http://localhost:5173`). The demo includes a default picker and a custom-themed picker with Monday start.
+
 ## License
 
 MIT
