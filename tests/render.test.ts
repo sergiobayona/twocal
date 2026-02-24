@@ -203,12 +203,13 @@ describe('renderFooter', () => {
 
 describe('renderPopup i18n', () => {
   it('sets dir=rtl for Arabic locale', () => {
+    const arTranslations = resolveTranslations('ar');
     const arConfig: RenderConfig = {
       ...config,
       locale: 'ar',
-      translations: resolveTranslations('ar'),
+      translations: arTranslations,
       isRTL: true,
-      presets: defaultPresets(resolveTranslations('ar')),
+      presets: defaultPresets(arTranslations),
     };
     const popup = renderPopup(stateWith({}), arConfig);
     expect(popup.getAttribute('dir')).toBe('rtl');
@@ -220,11 +221,12 @@ describe('renderPopup i18n', () => {
   });
 
   it('renders translated ARIA labels for navigation', () => {
+    const esTranslations = resolveTranslations('es');
     const esConfig: RenderConfig = {
       ...config,
       locale: 'es',
-      translations: resolveTranslations('es'),
-      presets: defaultPresets(resolveTranslations('es')),
+      translations: esTranslations,
+      presets: defaultPresets(esTranslations),
     };
     const popup = renderPopup(stateWith({}), esConfig);
     const prevBtn = popup.querySelector('[data-tc-action="prev-month"]')!;

@@ -26,8 +26,8 @@ export function renderPopup(state: TwoCalState, config: RenderConfig): HTMLEleme
   const p = config.stylePrefix;
   const popup = el('div', {
     class: `${p}-popup`,
-    ...(config.isRTL ? { dir: 'rtl' } : {}),
     ...dialogAttributes(config.translations),
+    ...(config.isRTL ? { dir: 'rtl' } : {}),
   });
 
   if (config.presets.length > 0) {

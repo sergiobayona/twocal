@@ -140,7 +140,7 @@ const ja: TwoCalTranslations = {
   nextMonth: '翌月',
 };
 
-const translationMap: Record<string, TwoCalTranslations> = {
+export const translationMap: Record<string, TwoCalTranslations> = {
   en, zh, hi, es, fr, ar, pt, de, ru, ja,
 };
 

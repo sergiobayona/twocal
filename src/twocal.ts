@@ -180,8 +180,8 @@ export class TwoCal {
   private mountPopup(): void {
     this.container.appendChild(this.popupContainer);
     this.rerender();
-    this.addEntryAnimation();
     this.updatePosition();
+    this.addEntryAnimation();
     this.bindPopupAndDocumentEvents();
 
     const resizeHandler = () => {
@@ -301,7 +301,9 @@ export class TwoCal {
     if (!popup) return;
     const enteringClass = `${this.stylePrefix}-popup--entering`;
     popup.classList.add(enteringClass);
-    popup.addEventListener('animationend', () => popup.classList.remove(enteringClass), { once: true });
+    const removeEnteringClass = () => popup.classList.remove(enteringClass);
+    popup.addEventListener('animationend', removeEnteringClass, { once: true });
+    popup.addEventListener('animationcancel', removeEnteringClass, { once: true });
   }
 
   private restoreFocus(): void {

@@ -65,6 +65,10 @@ describe('dialogAttributes', () => {
     const attrs = dialogAttributes(resolveTranslations('en-US'));
     expect(attrs.role).toBe('dialog');
     expect(attrs['aria-modal']).toBe('true');
+  });
+
+  it('returns translated aria-label for English', () => {
+    const attrs = dialogAttributes(resolveTranslations('en-US'));
     expect(attrs['aria-label']).toBe('Choose date range');
   });
 

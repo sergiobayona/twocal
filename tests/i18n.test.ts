@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { resolveTranslations, isRTL, en } from '../src/i18n';
+import { resolveTranslations, isRTL, en, translationMap } from '../src/i18n';
 import type { TwoCalTranslations } from '../src/types';
 
 const expectedKeys: (keyof TwoCalTranslations)[] = [
@@ -72,7 +72,7 @@ describe('resolveTranslations', () => {
 });
 
 describe('all translation bundles', () => {
-  const locales = ['en', 'zh', 'hi', 'es', 'fr', 'ar'];
+  const locales = Object.keys(translationMap);
 
   for (const locale of locales) {
     it(`${locale} has all required keys`, () => {
