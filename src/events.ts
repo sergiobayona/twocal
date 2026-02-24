@@ -1,5 +1,13 @@
-import type { EventConfig, EventDispatcher, StateAction } from './types';
-import { addDays, normalizeAndClampRange, parseCalendarDateString } from './calendar';
+import type { CalendarDate, EventConfig, EventDispatcher, StateAction } from './types';
+import {
+  addDays,
+  addMonths,
+  endOfMonth,
+  isWithinBounds,
+  normalizeAndClampRange,
+  parseCalendarDateString,
+  startOfMonth,
+} from './calendar';
 
 export function bindPopupEvents(
   popupElement: HTMLElement,
@@ -9,7 +17,7 @@ export function bindPopupEvents(
   const handleClick = createClickHandler(dispatch, config);
   const handleMouseover = createHoverHandler(dispatch, config);
   const handleMouseleave = createMouseleaveHandler(dispatch, config);
-  const handleKeydown = createKeydownHandler(dispatch);
+  const handleKeydown = createKeydownHandler(dispatch, config, popupElement);
 
   popupElement.addEventListener('click', handleClick);
   popupElement.addEventListener('mouseover', handleMouseover);
@@ -140,8 +148,13 @@ function createMouseleaveHandler(dispatch: EventDispatcher, config: EventConfig)
 
 // --- Keyboard Navigation ---
 
-function createKeydownHandler(dispatch: EventDispatcher) {
+function createKeydownHandler(dispatch: EventDispatcher, config: EventConfig, popupElement: HTMLElement) {
   return (event: KeyboardEvent) => {
+    if (event.key === 'Tab') {
+      handleTabTrap(event, popupElement);
+      return;
+    }
+
     const target = event.target as HTMLElement;
     const dateStr = target.getAttribute('data-tc-date');
     if (!dateStr) return;
@@ -149,7 +162,7 @@ function createKeydownHandler(dispatch: EventDispatcher) {
     const currentDate = parseCalendarDateString(dateStr);
     if (!currentDate) return;
 
-    const keyAction = resolveKeyAction(event.key, currentDate);
+    const keyAction = resolveKeyAction(event.key, currentDate, config);
     if (!keyAction) return;
 
     event.preventDefault();
@@ -157,20 +170,62 @@ function createKeydownHandler(dispatch: EventDispatcher) {
   };
 }
 
-function resolveKeyAction(key: string, currentDate: { year: number; month: number; day: number }): StateAction | null {
+function resolveKeyAction(key: string, currentDate: CalendarDate, config: EventConfig): StateAction | null {
   switch (key) {
     case 'ArrowLeft':
-      return { type: 'FOCUS_DATE', date: addDays(currentDate, -1) };
+      return focusDateAction(addDays(currentDate, -1), -1, config);
     case 'ArrowRight':
-      return { type: 'FOCUS_DATE', date: addDays(currentDate, 1) };
+      return focusDateAction(addDays(currentDate, 1), 1, config);
     case 'ArrowUp':
-      return { type: 'FOCUS_DATE', date: addDays(currentDate, -7) };
+      return focusDateAction(addDays(currentDate, -7), -1, config);
     case 'ArrowDown':
-      return { type: 'FOCUS_DATE', date: addDays(currentDate, 7) };
+      return focusDateAction(addDays(currentDate, 7), 1, config);
+    case 'Home':
+      return focusDateAction(startOfMonth(currentDate), 1, config);
+    case 'End':
+      return focusDateAction(endOfMonth(currentDate), -1, config);
+    case 'PageUp':
+      return focusDateAction(addMonths(currentDate, -1), -1, config);
+    case 'PageDown':
+      return focusDateAction(addMonths(currentDate, 1), 1, config);
     case 'Enter':
     case ' ':
       return { type: 'SELECT_DATE', date: currentDate };
     default:
       return null;
+  }
+}
+
+function focusDateAction(date: CalendarDate, direction: 1 | -1, config: EventConfig): StateAction {
+  return { type: 'FOCUS_DATE', date: skipDisabledDates(date, direction, config) };
+}
+
+/** Advance past disabled dates in the given direction, up to 31 steps. */
+function skipDisabledDates(date: CalendarDate, direction: 1 | -1, config: EventConfig): CalendarDate {
+  let candidate = date;
+  for (let i = 0; i < 31; i++) {
+    if (isWithinBounds(candidate, config.minDate, config.maxDate)) return candidate;
+    candidate = addDays(candidate, direction);
+  }
+  return date;
+}
+
+// --- Tab Trapping ---
+
+function handleTabTrap(event: KeyboardEvent, popupElement: HTMLElement): void {
+  const focusable = popupElement.querySelectorAll<HTMLElement>(
+    'button:not(:disabled), [tabindex="0"]',
+  );
+  if (focusable.length === 0) return;
+
+  const first = focusable[0]!;
+  const last = focusable[focusable.length - 1]!;
+
+  if (event.shiftKey && document.activeElement === first) {
+    event.preventDefault();
+    last.focus();
+  } else if (!event.shiftKey && document.activeElement === last) {
+    event.preventDefault();
+    first.focus();
   }
 }

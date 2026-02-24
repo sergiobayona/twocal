@@ -5,7 +5,7 @@ import type {
   DateRange,
   StateAction,
 } from './types';
-import { addMonths, ensureStartBeforeEnd, isSameDay, today } from './calendar';
+import { addMonths, compareDates, ensureStartBeforeEnd, isSameDay, today } from './calendar';
 
 export function createInitialState(options: Pick<TwoCalOptions, 'initialRange'>): TwoCalState {
   const now = today();
@@ -40,12 +40,36 @@ export function reduce(state: TwoCalState, action: StateAction): TwoCalState {
     case 'SELECT_PRESET':
       return selectPreset(state, action.preset, action.range);
     case 'FOCUS_DATE':
-      return { ...state, focusedDate: action.date };
+      return focusDate(state, action.date);
     case 'APPLY':
       return state.selectionPhase === 'range_complete' ? closePopup(state) : state;
     case 'CANCEL':
       return closePopup(state);
   }
+}
+
+function focusDate(state: TwoCalState, date: CalendarDate): TwoCalState {
+  const displayMonth = autoAdvanceMonth(state.displayMonth, date);
+  return { ...state, focusedDate: date, displayMonth };
+}
+
+/** Scroll the visible window so the focused date is on-screen. */
+function autoAdvanceMonth(displayMonth: CalendarDate, date: CalendarDate): CalendarDate {
+  const leftFirst = { year: displayMonth.year, month: displayMonth.month, day: 1 };
+  const pastRight = addMonths(leftFirst, 2);
+
+  // Before the left month
+  if (compareDates(date, leftFirst) < 0) {
+    return { year: date.year, month: date.month, day: 1 };
+  }
+
+  // On or after the first day of the month after the right calendar
+  if (compareDates(date, pastRight) >= 0) {
+    return { year: date.year, month: date.month, day: 1 };
+  }
+
+  // Still within the visible two-month window
+  return displayMonth;
 }
 
 function openPopup(state: TwoCalState): TwoCalState {

@@ -36,6 +36,14 @@ export function daysInMonth(year: number, month: number): number {
   return new Date(year, month, 0).getDate();
 }
 
+export function startOfMonth(date: CalendarDate): CalendarDate {
+  return createCalendarDate(date.year, date.month, 1);
+}
+
+export function endOfMonth(date: CalendarDate): CalendarDate {
+  return createCalendarDate(date.year, date.month, daysInMonth(date.year, date.month));
+}
+
 export function isSameDay(a: CalendarDate, b: CalendarDate): boolean {
   return a.year === b.year && a.month === b.month && a.day === b.day;
 }
