@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TwoCal Demo</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      margin: 0;
+      padding: 40px;
+      background: #f9fafb;
+      color: #1f2937;
+    }
+
+    h1 {
+      font-size: 28px;
+      font-weight: 700;
+      margin: 0 0 8px;
+    }
+
+    .subtitle {
+      color: #6b7280;
+      margin: 0 0 32px;
+    }
+
+    .demo-section {
+      background: #fff;
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      padding: 24px;
+      margin-bottom: 24px;
+      max-width: 600px;
+    }
+
+    .demo-section h2 {
+      font-size: 16px;
+      font-weight: 600;
+      margin: 0 0 16px;
+    }
+
+    .trigger-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 16px;
+      border: 1px solid #d1d5db;
+      border-radius: 8px;
+      background: #fff;
+      font-size: 14px;
+      color: #374151;
+      cursor: pointer;
+      transition: border-color 0.15s, box-shadow 0.15s;
+    }
+
+    .trigger-btn:hover {
+      border-color: #9ca3af;
+    }
+
+    .trigger-btn:focus {
+      outline: none;
+      border-color: #4f46e5;
+      box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15);
+    }
+
+    .trigger-btn svg {
+      width: 16px;
+      height: 16px;
+      stroke: currentColor;
+      fill: none;
+    }
+
+    .output {
+      margin-top: 16px;
+      padding: 12px;
+      background: #f3f4f6;
+      border-radius: 8px;
+      font-family: "SF Mono", "Fira Code", monospace;
+      font-size: 13px;
+      color: #6b7280;
+      min-height: 44px;
+      white-space: pre-wrap;
+    }
+  </style>
+</head>
+<body>
+  <h1>TwoCal</h1>
+  <p class="subtitle">Ultra-modern date range picker</p>
+
+  <div class="demo-section">
+    <h2>Default</h2>
+    <button id="trigger-default" class="trigger-btn">
+      <svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+        <line x1="16" y1="2" x2="16" y2="6"></line>
+        <line x1="8" y1="2" x2="8" y2="6"></line>
+        <line x1="3" y1="10" x2="21" y2="10"></line>
+      </svg>
+      <span id="trigger-default-text">Select date range</span>
+    </button>
+    <div id="output-default" class="output">No range selected</div>
+  </div>
+
+  <div class="demo-section">
+    <h2>Custom Theme (Rose, Monday start)</h2>
+    <button id="trigger-themed" class="trigger-btn">
+      <svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+        <line x1="16" y1="2" x2="16" y2="6"></line>
+        <line x1="8" y1="2" x2="8" y2="6"></line>
+        <line x1="3" y1="10" x2="21" y2="10"></line>
+      </svg>
+      <span id="trigger-themed-text">Select date range</span>
+    </button>
+    <div id="output-themed" class="output">No range selected</div>
+  </div>
+
+  <script type="module" src="./demo/demo.ts"></script>
+</body>
+</html>
