@@ -4,7 +4,7 @@
 [![license](https://img.shields.io/npm/l/twocal)](./LICENSE)
 [![TypeScript](https://img.shields.io/badge/TypeScript-strict-blue)](https://www.typescriptlang.org/)
 
-Framework-agnostic date range picker with dual calendars, presets, and theming.
+Framework-agnostic vibe-coded date range picker with dual calendars, presets, and theming.
 
 ## Features
 
@@ -149,3 +149,4 @@ import type {
 ## License
 
 MIT
+
