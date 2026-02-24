@@ -6,6 +6,8 @@
 
 Framework-agnostic vibe-coded date range picker with dual calendars, presets, and theming.
 
+![TwoCal date range picker](assets/screenshot.png)
+
 ## Features
 
 - Dual side-by-side calendar layout
