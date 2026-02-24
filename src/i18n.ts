@@ -148,7 +148,7 @@ export function resolveTranslations(
   locale: string,
   overrides?: Partial<TwoCalTranslations>,
 ): TwoCalTranslations {
-  const language = new Intl.Locale(locale).language;
+  const language = getLanguage(locale);
   const base = translationMap[language] ?? en;
 
   if (!overrides) return base;
@@ -162,6 +162,14 @@ export function resolveTranslations(
 const RTL_LANGUAGES = new Set(['ar', 'he', 'fa', 'ur']);
 
 export function isRTL(locale: string): boolean {
-  const language = new Intl.Locale(locale).language;
+  const language = getLanguage(locale);
   return RTL_LANGUAGES.has(language);
+}
+
+function getLanguage(locale: string): string {
+  try {
+    return new Intl.Locale(locale).language;
+  } catch {
+    return 'en';
+  }
 }

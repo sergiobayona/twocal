@@ -58,7 +58,21 @@ describe('computePosition', () => {
       0,
     );
     expect(result.placement).toBe('top');
-    expect(result.top).toBe(-308); // top (100) - height (400) - gap (8)
+    expect(result.top).toBe(8); // clamped to viewport padding
+  });
+
+  it('clamps top when flipped placement would overflow above viewport', () => {
+    const result = computePosition(
+      makeTriggerRect({ top: 50, bottom: 90 }),
+      popupSize,
+      'bottom',
+      300, // not enough space below
+      1200,
+      0,
+      0,
+    );
+    expect(result.placement).toBe('top');
+    expect(result.top).toBe(8);
   });
 
   it('clamps left when popup would overflow right edge', () => {

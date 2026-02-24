@@ -5,6 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/),
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [Unreleased]
+
+### Added
+
+- Home/End keys to jump to first/last day of the month
+- Page Up/Page Down keys to move focus by one month
+- Auto-scroll when keyboard focus moves beyond the visible two-month window
+- Tab trapping within the dialog (presets, grid, footer cycle)
+- Disabled date skipping — arrow and page keys automatically advance past dates outside `minDate`/`maxDate`
+- `startOfMonth()` and `endOfMonth()` calendar utilities
+
 ## [0.1.0] - 2026-02-24
 
 ### Added

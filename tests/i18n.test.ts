@@ -53,6 +53,11 @@ describe('resolveTranslations', () => {
     expect(t).toEqual(en);
   });
 
+  it('falls back to English for invalid locale strings', () => {
+    const t = resolveTranslations('en_US');
+    expect(t).toEqual(en);
+  });
+
   it('merges partial overrides', () => {
     const t = resolveTranslations('es', { apply: 'Confirmar' });
     expect(t.apply).toBe('Confirmar');
@@ -102,5 +107,9 @@ describe('isRTL', () => {
 
   it('returns false for Spanish', () => {
     expect(isRTL('es')).toBe(false);
+  });
+
+  it('returns false for invalid locale strings', () => {
+    expect(isRTL('en_US')).toBe(false);
   });
 });

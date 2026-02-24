@@ -12,7 +12,7 @@ Framework-agnostic vibe-coded date range picker with dual calendars, presets, an
 
 - Dual side-by-side calendar layout
 - Built-in preset ranges (Today, Last 7 Days, Last Month, etc.)
-- Full keyboard navigation and ARIA support
+- Full keyboard navigation (arrow keys, Home/End, Page Up/Down) and ARIA support
 - Customizable theming via CSS custom properties
 - Locale-aware formatting via `Intl` API
 - Zero dependencies — vanilla TypeScript, works with any framework
@@ -91,6 +91,22 @@ new TwoCal({
   },
 });
 ```
+
+## Keyboard Navigation
+
+The picker is fully operable via keyboard, meeting WCAG 2.1 AA requirements:
+
+| Key | Action |
+|-----|--------|
+| `Arrow Left` / `Arrow Right` | Move focus by one day |
+| `Arrow Up` / `Arrow Down` | Move focus by one week |
+| `Home` / `End` | Jump to first / last day of the month |
+| `Page Up` / `Page Down` | Move focus to the same day in the previous / next month |
+| `Enter` / `Space` | Select the focused date |
+| `Escape` | Close the picker |
+| `Tab` / `Shift+Tab` | Move between presets, calendar grid, and footer buttons (focus is trapped within the dialog) |
+
+When arrow keys or page keys move focus beyond the visible calendars, the view auto-scrolls. Disabled dates (outside `minDate`/`maxDate`) are automatically skipped.
 
 ## Methods
 

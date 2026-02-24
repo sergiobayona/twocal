@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { bindPopupEvents, bindTriggerEvents, bindDocumentEvents } from '../src/events';
 import { defaultPresets } from '../src/presets';
 import type { EventConfig, StateAction } from '../src/types';
@@ -24,12 +24,6 @@ describe('bindPopupEvents', () => {
     cleanup();
     popup.remove();
   });
-
-  function afterEach(fn: () => void) {
-    // vitest global afterEach
-    vi.fn(); // no-op; using inline cleanup
-    return fn; // note: this is just for structure, actual vitest afterEach is at module level
-  }
 
   it('dispatches SELECT_DATE on day click', () => {
     const btn = document.createElement('button');
@@ -139,6 +133,121 @@ describe('bindPopupEvents', () => {
       type: 'SELECT_DATE',
       date: { year: 2026, month: 2, day: 15 },
     });
+  });
+
+  it('dispatches FOCUS_DATE with first of month on Home key', () => {
+    const btn = document.createElement('button');
+    btn.setAttribute('data-tc-date', '2026-02-15');
+    popup.appendChild(btn);
+
+    btn.dispatchEvent(new KeyboardEvent('keydown', { key: 'Home', bubbles: true }));
+    expect(dispatched[0]).toEqual({
+      type: 'FOCUS_DATE',
+      date: { year: 2026, month: 2, day: 1 },
+    });
+  });
+
+  it('dispatches FOCUS_DATE with last of month on End key', () => {
+    const btn = document.createElement('button');
+    btn.setAttribute('data-tc-date', '2026-02-15');
+    popup.appendChild(btn);
+
+    btn.dispatchEvent(new KeyboardEvent('keydown', { key: 'End', bubbles: true }));
+    expect(dispatched[0]).toEqual({
+      type: 'FOCUS_DATE',
+      date: { year: 2026, month: 2, day: 28 },
+    });
+  });
+
+  it('dispatches FOCUS_DATE with previous month on PageUp', () => {
+    const btn = document.createElement('button');
+    btn.setAttribute('data-tc-date', '2026-02-15');
+    popup.appendChild(btn);
+
+    btn.dispatchEvent(new KeyboardEvent('keydown', { key: 'PageUp', bubbles: true }));
+    expect(dispatched[0]).toEqual({
+      type: 'FOCUS_DATE',
+      date: { year: 2026, month: 1, day: 15 },
+    });
+  });
+
+  it('dispatches FOCUS_DATE with next month on PageDown', () => {
+    const btn = document.createElement('button');
+    btn.setAttribute('data-tc-date', '2026-02-15');
+    popup.appendChild(btn);
+
+    btn.dispatchEvent(new KeyboardEvent('keydown', { key: 'PageDown', bubbles: true }));
+    expect(dispatched[0]).toEqual({
+      type: 'FOCUS_DATE',
+      date: { year: 2026, month: 3, day: 15 },
+    });
+  });
+
+  it('skips disabled dates when arrowing past minDate', () => {
+    cleanup();
+    const restrictedConfig: EventConfig = {
+      ...config,
+      minDate: { year: 2026, month: 2, day: 10 },
+    };
+    cleanup = bindPopupEvents(popup, (a) => dispatched.push(a), restrictedConfig);
+
+    const btn = document.createElement('button');
+    btn.setAttribute('data-tc-date', '2026-02-11');
+    popup.appendChild(btn);
+
+    btn.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowLeft', bubbles: true }));
+    expect(dispatched[0]).toEqual({
+      type: 'FOCUS_DATE',
+      date: { year: 2026, month: 2, day: 10 },
+    });
+  });
+
+  it('skips disabled dates when arrowing past maxDate', () => {
+    cleanup();
+    const restrictedConfig: EventConfig = {
+      ...config,
+      maxDate: { year: 2026, month: 2, day: 20 },
+    };
+    cleanup = bindPopupEvents(popup, (a) => dispatched.push(a), restrictedConfig);
+
+    const btn = document.createElement('button');
+    btn.setAttribute('data-tc-date', '2026-02-19');
+    popup.appendChild(btn);
+
+    btn.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowRight', bubbles: true }));
+    expect(dispatched[0]).toEqual({
+      type: 'FOCUS_DATE',
+      date: { year: 2026, month: 2, day: 20 },
+    });
+  });
+
+  it('traps Tab at the end of the popup', () => {
+    const first = document.createElement('button');
+    first.setAttribute('data-tc-date', '2026-02-01');
+    const last = document.createElement('button');
+    last.setAttribute('data-tc-action', 'apply');
+    popup.append(first, last);
+
+    last.focus();
+    const event = new KeyboardEvent('keydown', { key: 'Tab', bubbles: true });
+    const spy = vi.spyOn(event, 'preventDefault');
+    popup.dispatchEvent(event);
+    expect(spy).toHaveBeenCalled();
+  });
+
+  it('traps Shift+Tab at the start of the popup', () => {
+    const first = document.createElement('button');
+    first.setAttribute('data-tc-date', '2026-02-01');
+    first.setAttribute('tabindex', '0');
+    const last = document.createElement('button');
+    last.setAttribute('data-tc-action', 'apply');
+    popup.append(first, last);
+
+    first.focus();
+    const event = new KeyboardEvent('keydown', { key: 'Tab', shiftKey: true, bubbles: true });
+    const spy = vi.spyOn(event, 'preventDefault');
+    popup.dispatchEvent(event);
+    expect(spy).toHaveBeenCalled();
   });
 });
 

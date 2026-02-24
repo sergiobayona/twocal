@@ -53,12 +53,15 @@ function computeTop(
   scrollY: number,
 ): number {
   const belowTop = triggerRect.bottom + scrollY + GAP;
+  const aboveTop = triggerRect.top + scrollY - popupHeight - GAP;
+  const minTop = scrollY + VIEWPORT_PADDING;
+  const maxTop = scrollY + viewportHeight - VIEWPORT_PADDING - popupHeight;
 
-  if (preferredPlacement === 'top' || wouldOverflowBelow(triggerRect, popupHeight, viewportHeight)) {
-    return triggerRect.top + scrollY - popupHeight - GAP;
-  }
+  const rawTop = preferredPlacement === 'top' || wouldOverflowBelow(triggerRect, popupHeight, viewportHeight)
+    ? aboveTop
+    : belowTop;
 
-  return belowTop;
+  return clamp(rawTop, minTop, maxTop);
 }
 
 function computeLeft(
@@ -91,4 +94,9 @@ function wouldOverflowBelow(
   viewportHeight: number,
 ): boolean {
   return triggerRect.bottom + GAP + popupHeight > viewportHeight;
+}
+
+function clamp(value: number, min: number, max: number): number {
+  if (max < min) return min;
+  return Math.min(Math.max(value, min), max);
 }
