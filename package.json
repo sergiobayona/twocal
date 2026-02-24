@@ -1,6 +1,6 @@
 {
   "name": "twocal",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "type": "module",
   "description": "Ultra-modern, framework-agnostic date range picker",
   "main": "./dist/twocal.umd.cjs",
