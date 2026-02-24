@@ -64,6 +64,9 @@ export function buildStylesheet(theme: ResolvedTheme, p: string): string {
   font-size: var(--tc-font-size);
   color: var(--tc-text);
   user-select: none;
+}
+
+.${p}-popup--entering {
   animation: ${p}-fadeIn 0.15s ease-out;
 }
 
@@ -296,6 +299,19 @@ export function buildStylesheet(theme: ResolvedTheme, p: string): string {
 
 .${p}-hidden {
   display: none;
+}
+
+.${p}-popup[dir="rtl"] .${p}-presets {
+  border-right: none;
+  border-left: 1px solid var(--tc-border);
+}
+
+.${p}-popup[dir="rtl"] .${p}-preset {
+  text-align: right;
+}
+
+.${p}-popup[dir="rtl"] .${p}-footer {
+  justify-content: flex-start;
 }
 `.trim();
 }

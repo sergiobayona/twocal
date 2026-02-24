@@ -1,4 +1,4 @@
-import type { CalendarDate, TwoCalState } from './types';
+import type { CalendarDate, TwoCalState, TwoCalTranslations } from './types';
 import { isSameDay } from './calendar';
 
 export function gridCellAttributes(
@@ -20,11 +20,11 @@ export function gridCellAttributes(
   };
 }
 
-export function dialogAttributes(): Record<string, string> {
+export function dialogAttributes(translations: TwoCalTranslations): Record<string, string> {
   return {
     role: 'dialog',
     'aria-modal': 'true',
-    'aria-label': 'Choose date range',
+    'aria-label': translations.chooseDateRange,
   };
 }
 

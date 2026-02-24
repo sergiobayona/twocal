@@ -2,13 +2,18 @@ import { describe, it, expect, vi, afterEach } from 'vitest';
 import { renderPopup, renderDayCell, renderPresetsSidebar, renderFooter } from '../src/render';
 import { createCalendarDate } from '../src/calendar';
 import { defaultPresets } from '../src/presets';
+import { resolveTranslations } from '../src/i18n';
 import type { TwoCalState, RenderConfig } from '../src/types';
+
+const translations = resolveTranslations('en-US');
 
 const config: RenderConfig = {
   locale: 'en-US',
   firstDayOfWeek: 0,
   presets: defaultPresets(),
   stylePrefix: 'tc-t',
+  translations,
+  isRTL: false,
 };
 
 function stateWith(overrides: Partial<TwoCalState>): TwoCalState {
@@ -169,20 +174,62 @@ describe('renderPresetsSidebar', () => {
 
 describe('renderFooter', () => {
   it('renders cancel and apply buttons', () => {
-    const footer = renderFooter(true, 'tc-t');
+    const footer = renderFooter(true, 'tc-t', translations);
     expect(footer.querySelector('[data-tc-action="cancel"]')).not.toBeNull();
     expect(footer.querySelector('[data-tc-action="apply"]')).not.toBeNull();
   });
 
   it('disables apply when canApply is false', () => {
-    const footer = renderFooter(false, 'tc-t');
+    const footer = renderFooter(false, 'tc-t', translations);
     const apply = footer.querySelector('[data-tc-action="apply"]') as HTMLButtonElement;
     expect(apply.hasAttribute('disabled')).toBe(true);
   });
 
   it('enables apply when canApply is true', () => {
-    const footer = renderFooter(true, 'tc-t');
+    const footer = renderFooter(true, 'tc-t', translations);
     const apply = footer.querySelector('[data-tc-action="apply"]') as HTMLButtonElement;
     expect(apply.hasAttribute('disabled')).toBe(false);
+  });
+
+  it('renders translated button labels', () => {
+    const esTranslations = resolveTranslations('es');
+    const footer = renderFooter(true, 'tc-t', esTranslations);
+    const cancel = footer.querySelector('[data-tc-action="cancel"]')!;
+    const apply = footer.querySelector('[data-tc-action="apply"]')!;
+    expect(cancel.textContent).toBe('Cancelar');
+    expect(apply.textContent).toBe('Aplicar');
+  });
+});
+
+describe('renderPopup i18n', () => {
+  it('sets dir=rtl for Arabic locale', () => {
+    const arConfig: RenderConfig = {
+      ...config,
+      locale: 'ar',
+      translations: resolveTranslations('ar'),
+      isRTL: true,
+      presets: defaultPresets(resolveTranslations('ar')),
+    };
+    const popup = renderPopup(stateWith({}), arConfig);
+    expect(popup.getAttribute('dir')).toBe('rtl');
+  });
+
+  it('does not set dir attribute for LTR locales', () => {
+    const popup = renderPopup(stateWith({}), config);
+    expect(popup.hasAttribute('dir')).toBe(false);
+  });
+
+  it('renders translated ARIA labels for navigation', () => {
+    const esConfig: RenderConfig = {
+      ...config,
+      locale: 'es',
+      translations: resolveTranslations('es'),
+      presets: defaultPresets(resolveTranslations('es')),
+    };
+    const popup = renderPopup(stateWith({}), esConfig);
+    const prevBtn = popup.querySelector('[data-tc-action="prev-month"]')!;
+    const nextBtn = popup.querySelector('[data-tc-action="next-month"]')!;
+    expect(prevBtn.getAttribute('aria-label')).toBe('Mes anterior');
+    expect(nextBtn.getAttribute('aria-label')).toBe('Mes siguiente');
   });
 });

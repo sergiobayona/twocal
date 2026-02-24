@@ -59,6 +59,37 @@ All options passed to the `TwoCal` constructor:
 | `locale` | `string` | `'en-US'` | BCP 47 locale for month/day names and formatting. |
 | `container` | `HTMLElement` | `document.body` | Parent element for the popup. |
 
+## Supported Languages
+
+Built-in translations for UI strings (presets, buttons, ARIA labels):
+
+| Language | Locale examples | RTL |
+|----------|----------------|-----|
+| English | `en-US`, `en-GB` | No |
+| Chinese | `zh-CN`, `zh-TW` | No |
+| Hindi | `hi-IN` | No |
+| Spanish | `es-ES`, `es-MX` | No |
+| French | `fr-FR`, `fr-CA` | No |
+| Portuguese | `pt-BR`, `pt-PT` | No |
+| German | `de-DE`, `de-AT` | No |
+| Russian | `ru-RU` | No |
+| Japanese | `ja-JP` | No |
+| Arabic | `ar-SA`, `ar-EG` | Yes |
+
+Any locale not listed above falls back to English. You can override individual strings via the `translations` option:
+
+```typescript
+new TwoCal({
+  trigger,
+  onRangeSelect,
+  locale: 'de-DE',
+  translations: {
+    cancel: 'Abbrechen',
+    apply: 'Übernehmen',
+  },
+});
+```
+
 ## Methods
 
 | Method | Description |

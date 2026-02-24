@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { gridCellAttributes, dialogAttributes, calendarGridAttributes } from '../src/aria';
 import { createCalendarDate } from '../src/calendar';
+import { resolveTranslations } from '../src/i18n';
 import type { TwoCalState } from '../src/types';
 
 function stateWith(overrides: Partial<TwoCalState>): TwoCalState {
@@ -61,10 +62,15 @@ describe('gridCellAttributes', () => {
 
 describe('dialogAttributes', () => {
   it('returns dialog role with aria-modal', () => {
-    const attrs = dialogAttributes();
+    const attrs = dialogAttributes(resolveTranslations('en-US'));
     expect(attrs.role).toBe('dialog');
     expect(attrs['aria-modal']).toBe('true');
     expect(attrs['aria-label']).toBe('Choose date range');
+  });
+
+  it('returns translated aria-label for Spanish', () => {
+    const attrs = dialogAttributes(resolveTranslations('es'));
+    expect(attrs['aria-label']).toBe('Elegir rango de fechas');
   });
 });
 

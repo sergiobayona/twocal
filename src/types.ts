@@ -26,6 +26,22 @@ export interface TwoCalState {
   readonly focusedDate: CalendarDate | null;
 }
 
+// ---- i18n Types ----
+
+export interface TwoCalTranslations {
+  readonly today: string;
+  readonly yesterday: string;
+  readonly last7Days: string;
+  readonly last30Days: string;
+  readonly thisMonth: string;
+  readonly lastMonth: string;
+  readonly cancel: string;
+  readonly apply: string;
+  readonly chooseDateRange: string;
+  readonly previousMonth: string;
+  readonly nextMonth: string;
+}
+
 // ---- Configuration Types ----
 
 export interface PresetRange {
@@ -64,6 +80,7 @@ export interface TwoCalOptions {
   readonly placement?: Placement;
   readonly firstDayOfWeek?: 0 | 1;
   readonly locale?: string;
+  readonly translations?: Partial<TwoCalTranslations>;
   readonly container?: HTMLElement;
 }
 
@@ -82,6 +99,8 @@ export interface RenderConfig {
   readonly minDate?: CalendarDate | undefined;
   readonly maxDate?: CalendarDate | undefined;
   readonly stylePrefix: string;
+  readonly translations: TwoCalTranslations;
+  readonly isRTL: boolean;
 }
 
 // ---- State Actions ----
