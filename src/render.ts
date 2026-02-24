@@ -2,6 +2,7 @@ import type {
   CalendarDate,
   CalendarMonth,
   TwoCalState,
+  TwoCalTranslations,
   PresetRange,
   RenderConfig,
 } from './types';
@@ -25,7 +26,8 @@ export function renderPopup(state: TwoCalState, config: RenderConfig): HTMLEleme
   const p = config.stylePrefix;
   const popup = el('div', {
     class: `${p}-popup`,
-    ...dialogAttributes(),
+    ...dialogAttributes(config.translations),
+    ...(config.isRTL ? { dir: 'rtl' } : {}),
   });
 
   if (config.presets.length > 0) {
@@ -34,7 +36,7 @@ export function renderPopup(state: TwoCalState, config: RenderConfig): HTMLEleme
 
   const body = el('div', { class: `${p}-body` });
   body.appendChild(renderCalendars(state, config));
-  body.appendChild(renderFooter(state.selectionPhase === 'range_complete', p));
+  body.appendChild(renderFooter(state.selectionPhase === 'range_complete', p, config.translations));
   popup.appendChild(body);
 
   return popup;
@@ -91,7 +93,7 @@ function renderHeader(
   const header = el('div', { class: `${p}-header` });
 
   const prevBtn = side === 'left'
-    ? el('button', { class: `${p}-nav-btn`, 'data-tc-action': 'prev-month', 'aria-label': 'Previous month' }, ['\u2039'])
+    ? el('button', { class: `${p}-nav-btn`, 'data-tc-action': 'prev-month', 'aria-label': config.translations.previousMonth }, ['\u2039'])
     : el('span');
 
   const title = el('span', { class: `${p}-header-title`, id: labelId, 'aria-live': 'polite' }, [
@@ -99,7 +101,7 @@ function renderHeader(
   ]);
 
   const nextBtn = side === 'right'
-    ? el('button', { class: `${p}-nav-btn`, 'data-tc-action': 'next-month', 'aria-label': 'Next month' }, ['\u203A'])
+    ? el('button', { class: `${p}-nav-btn`, 'data-tc-action': 'next-month', 'aria-label': config.translations.nextMonth }, ['\u203A'])
     : el('span');
 
   header.append(prevBtn, title, nextBtn);
@@ -225,7 +227,11 @@ export function renderPresetsSidebar(
   return sidebar;
 }
 
-export function renderFooter(canApply: boolean, stylePrefix: string): HTMLElement {
+export function renderFooter(
+  canApply: boolean,
+  stylePrefix: string,
+  translations: TwoCalTranslations,
+): HTMLElement {
   const p = stylePrefix;
   const footer = el('div', { class: `${p}-footer` });
 
@@ -233,14 +239,14 @@ export function renderFooter(canApply: boolean, stylePrefix: string): HTMLElemen
     class: `${p}-btn ${p}-btn--secondary`,
     'data-tc-action': 'cancel',
     type: 'button',
-  }, ['Cancel']);
+  }, [translations.cancel]);
 
   const applyBtn = el('button', {
     class: `${p}-btn ${p}-btn--primary`,
     'data-tc-action': 'apply',
     type: 'button',
     ...(canApply ? {} : { disabled: '' }),
-  }, ['Apply']);
+  }, [translations.apply]);
 
   footer.append(cancelBtn, applyBtn);
   return footer;

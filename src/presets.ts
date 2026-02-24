@@ -1,39 +1,40 @@
-import type { PresetRange } from './types';
+import type { PresetRange, TwoCalTranslations } from './types';
 import { today, addDays, daysInMonth } from './calendar';
+import { en } from './i18n';
 
-export function defaultPresets(): PresetRange[] {
+export function defaultPresets(translations: TwoCalTranslations = en): PresetRange[] {
   return [
     {
-      label: 'Today',
+      label: translations.today,
       range: () => {
         const t = today();
         return { start: t, end: t };
       },
     },
     {
-      label: 'Yesterday',
+      label: translations.yesterday,
       range: () => {
         const y = addDays(today(), -1);
         return { start: y, end: y };
       },
     },
     {
-      label: 'Last 7 Days',
+      label: translations.last7Days,
       range: () => ({ start: addDays(today(), -6), end: today() }),
     },
     {
-      label: 'Last 30 Days',
+      label: translations.last30Days,
       range: () => ({ start: addDays(today(), -29), end: today() }),
     },
     {
-      label: 'This Month',
+      label: translations.thisMonth,
       range: () => {
         const t = today();
         return { start: { year: t.year, month: t.month, day: 1 }, end: t };
       },
     },
     {
-      label: 'Last Month',
+      label: translations.lastMonth,
       range: () => {
         const t = today();
         const prevMonth = t.month === 1 ? 12 : t.month - 1;

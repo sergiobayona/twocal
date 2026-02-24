@@ -12,6 +12,7 @@ import { bindPopupEvents, bindTriggerEvents, bindDocumentEvents } from './events
 import { computePosition } from './position';
 import { generateStylePrefix, injectStyles, removeStyles, resolveTheme } from './styles';
 import { defaultPresets } from './presets';
+import { resolveTranslations, isRTL } from './i18n';
 import { calendarDateToString, isSameDay, isBetween, ensureStartBeforeEnd } from './calendar';
 
 export class TwoCal {
@@ -47,13 +48,18 @@ export class TwoCal {
     const theme = resolveTheme(options.theme);
     this.styleElement = injectStyles(theme, this.stylePrefix);
 
+    const locale = options.locale ?? 'en-US';
+    const translations = resolveTranslations(locale, options.translations);
+
     this.renderConfig = {
-      locale: options.locale ?? 'en-US',
+      locale,
       firstDayOfWeek: options.firstDayOfWeek ?? 0,
-      presets: options.presets ?? defaultPresets(),
+      presets: options.presets ?? defaultPresets(translations),
       minDate: options.minDate,
       maxDate: options.maxDate,
       stylePrefix: this.stylePrefix,
+      translations,
+      isRTL: isRTL(locale),
     };
 
     this.state = createInitialState(options);
@@ -175,6 +181,7 @@ export class TwoCal {
     this.container.appendChild(this.popupContainer);
     this.rerender();
     this.updatePosition();
+    this.addEntryAnimation();
     this.bindPopupAndDocumentEvents();
 
     const resizeHandler = () => {
@@ -287,6 +294,16 @@ export class TwoCal {
         cell.classList.add(previewClass);
       }
     }
+  }
+
+  private addEntryAnimation(): void {
+    const popup = this.popupContainer.firstElementChild as HTMLElement | null;
+    if (!popup) return;
+    const enteringClass = `${this.stylePrefix}-popup--entering`;
+    popup.classList.add(enteringClass);
+    const removeEnteringClass = () => popup.classList.remove(enteringClass);
+    popup.addEventListener('animationend', removeEnteringClass, { once: true });
+    popup.addEventListener('animationcancel', removeEnteringClass, { once: true });
   }
 
   private restoreFocus(): void {

@@ -64,6 +64,9 @@ export function buildStylesheet(theme: ResolvedTheme, p: string): string {
   font-size: var(--tc-font-size);
   color: var(--tc-text);
   user-select: none;
+}
+
+.${p}-popup--entering {
   animation: ${p}-fadeIn 0.15s ease-out;
 }
 
@@ -77,7 +80,7 @@ export function buildStylesheet(theme: ResolvedTheme, p: string): string {
   flex-direction: column;
   gap: 2px;
   padding: 16px;
-  border-right: 1px solid var(--tc-border);
+  border-inline-end: 1px solid var(--tc-border);
   min-width: 150px;
 }
 
@@ -90,7 +93,7 @@ export function buildStylesheet(theme: ResolvedTheme, p: string): string {
   font-family: var(--tc-font);
   font-size: var(--tc-font-size);
   cursor: pointer;
-  text-align: left;
+  text-align: start;
   transition: background 0.1s, color 0.1s;
   white-space: nowrap;
 }
@@ -297,5 +300,6 @@ export function buildStylesheet(theme: ResolvedTheme, p: string): string {
 .${p}-hidden {
   display: none;
 }
+
 `.trim();
 }
