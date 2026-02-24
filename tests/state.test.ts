@@ -223,8 +223,7 @@ describe('reduce FOCUS_DATE', () => {
     });
     const jan15 = createCalendarDate(2026, 1, 15);
     const next = reduce(state, { type: 'FOCUS_DATE', date: jan15 });
-    expect(next.displayMonth.month).toBe(1);
-    expect(next.displayMonth.year).toBe(2026);
+    expect(next.displayMonth).toEqual(createCalendarDate(2026, 1, 1));
   });
 
   it('auto-advances displayMonth when focus moves past right calendar', () => {
@@ -235,7 +234,7 @@ describe('reduce FOCUS_DATE', () => {
     // Right calendar shows March; April is past it
     const apr5 = createCalendarDate(2026, 4, 5);
     const next = reduce(state, { type: 'FOCUS_DATE', date: apr5 });
-    expect(next.displayMonth.month).toBe(4);
+    expect(next.displayMonth).toEqual(createCalendarDate(2026, 4, 1));
   });
 
   it('does not advance displayMonth when focus stays within visible months', () => {
@@ -246,7 +245,7 @@ describe('reduce FOCUS_DATE', () => {
     // March is the right calendar — should stay
     const mar15 = createCalendarDate(2026, 3, 15);
     const next = reduce(state, { type: 'FOCUS_DATE', date: mar15 });
-    expect(next.displayMonth.month).toBe(2);
+    expect(next.displayMonth).toEqual(state.displayMonth);
   });
 
   it('handles year boundary when advancing backward', () => {
@@ -256,7 +255,6 @@ describe('reduce FOCUS_DATE', () => {
     });
     const dec25 = createCalendarDate(2025, 12, 25);
     const next = reduce(state, { type: 'FOCUS_DATE', date: dec25 });
-    expect(next.displayMonth.month).toBe(12);
-    expect(next.displayMonth.year).toBe(2025);
+    expect(next.displayMonth).toEqual(createCalendarDate(2025, 12, 1));
   });
 });

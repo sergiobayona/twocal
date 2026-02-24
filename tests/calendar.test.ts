@@ -186,7 +186,6 @@ describe('formatMonthYear', () => {
   });
 
   it('falls back for invalid locale strings', () => {
-    expect(() => formatMonthYear(2026, 2, 'en_US')).not.toThrow();
     const result = formatMonthYear(2026, 2, 'en_US');
     expect(result.length).toBeGreaterThan(0);
   });

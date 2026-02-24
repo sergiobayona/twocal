@@ -100,11 +100,11 @@ describe('open / close', () => {
     expect(onClose).toHaveBeenCalledOnce();
   });
 
-  it('sets an initial focused day for keyboard navigation', () => {
+  it('sets exactly one focused day for keyboard navigation', () => {
     createPicker();
     picker.open();
-    const focusedDay = document.querySelector('[data-tc-date][tabindex="0"]');
-    expect(focusedDay).not.toBeNull();
+    const focusedDays = document.querySelectorAll('[data-tc-date][tabindex="0"]');
+    expect(focusedDays).toHaveLength(1);
   });
 });
 

@@ -110,7 +110,7 @@ export class TwoCal {
       selectionPhase: 'range_complete',
       activePreset: null,
       hoveredDate: null,
-      focusedDate: normalized.end,
+      focusedDate: normalized.start,
       displayMonth: { year: normalized.start.year, month: normalized.start.month, day: 1 },
     };
 
